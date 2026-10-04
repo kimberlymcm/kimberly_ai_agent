@@ -5,7 +5,7 @@ import { noteQuestion, sendAlert } from "./notify";
 export const TOOLS = [
   {
     name: "ask_kimberly",
-    description: `Ask a question about ${PROFILE.name}: her work, background, and interests. Answers come from her curated profile.`,
+    description: `Ask a question about ${PROFILE.name}: her work, background, interests, and Substack writing. Answers come from her curated profile and posts, and link to relevant posts. Returns plain text. To schedule a call use request_meeting, not this tool.`,
     inputSchema: {
       type: "object",
       properties: { question: { type: "string", maxLength: 2000 } },
@@ -14,13 +14,13 @@ export const TOOLS = [
   },
   {
     name: "request_meeting",
-    description: `Request a meeting with ${PROFILE.name}. This queues a request for her review; it does not book anything. Types: ${PROFILE.meetingTypes.join("; ")}.`,
+    description: `Request a meeting with ${PROFILE.name}. This queues a request for her review; it does not book or confirm anything, and she replies at reply_to if interested. Returns a confirmation with a reference id. Required: requester, reply_to, purpose.`,
     inputSchema: {
       type: "object",
       properties: {
         requester: { type: "string", description: "Who is asking (person/org and the agent acting for them)" },
-        reply_to: { type: "string", description: "Email or URL where Kimberly can respond" },
-        meeting_type: { type: "string" },
+        reply_to: { type: "string", description: "Required. Monitored email or URL where Kimberly can respond; this is the only way she can reach you" },
+        meeting_type: { type: "string", enum: ["intro_call_15min", "working_session_45min"], description: "intro_call_15min (default) or working_session_45min" },
         purpose: { type: "string", maxLength: 2000 },
         preferred_times: { type: "string", description: "Windows with timezone" },
       },
@@ -29,12 +29,12 @@ export const TOOLS = [
   },
   {
     name: "leave_message",
-    description: `Leave an asynchronous message for ${PROFILE.name}.`,
+    description: `Leave an asynchronous message for ${PROFILE.name} (not for scheduling; use request_meeting for that). Returns a confirmation with a reference id. reply_to is optional here, but without it she cannot answer. Rate limit: about 30 requests per minute per IP.`,
     inputSchema: {
       type: "object",
       properties: {
-        from: { type: "string" },
-        reply_to: { type: "string" },
+        from: { type: "string", description: "Who is writing (person/org and the agent acting for them)" },
+        reply_to: { type: "string", description: "Optional. Email or URL for a reply" },
         message: { type: "string", maxLength: 4000 },
       },
       required: ["from", "message"],

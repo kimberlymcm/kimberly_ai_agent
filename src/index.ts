@@ -32,9 +32,9 @@ const agentCard = () => ({
   defaultInputModes: ["text/plain"],
   defaultOutputModes: ["text/plain"],
   skills: [
-    { id: "ask", name: "Ask about Kimberly", description: "Questions about her work and background.", tags: ["profile", "qa"] },
-    { id: "request_meeting", name: "Request a meeting", description: "Queue a meeting request for her review.", tags: ["scheduling"] },
-    { id: "leave_message", name: "Leave a message", description: "Asynchronous message to her inbox.", tags: ["messaging"] },
+    { id: "ask", name: "Ask about Kimberly", description: "Questions about her work, background and writing. Send any plain text question.", tags: ["profile", "qa"], examples: ["What has Kimberly written about AI change management?"] },
+    { id: "request_meeting", name: "Request a meeting", description: "Queue a meeting request for her review. Send text starting with \"/meeting \" followed by who you are, how she can reach you (email), and the purpose. Nothing is booked.", tags: ["scheduling"], examples: ["/meeting Alex Lee (alex@example.com), via assistant agent: 15-min intro call about AI adoption in health systems; weekdays 1-4pm PT"] },
+    { id: "leave_message", name: "Leave a message", description: "Asynchronous message to her inbox. Send text starting with \"/message \".", tags: ["messaging"], examples: ["/message Hi Kimberly, loved your data platform post. Reach me at alex@example.com"] },
   ],
 });
 
@@ -47,6 +47,26 @@ This is the agent endpoint for ${PROFILE.name}. AI agents can talk to it three w
 - MCP (streamable HTTP, stateless): ${BASE}/mcp. Tools: ask_kimberly, request_meeting, leave_message
 - A2A (JSON-RPC): ${BASE}/a2a. Agent card: ${BASE}/.well-known/agent.json
 - Plain text profile: ${BASE}/llms.txt (this file)
+
+## How to use (MCP, no SDK needed)
+Send JSON-RPC 2.0 over HTTP POST to ${BASE}/mcp with headers \`Content-Type: application/json\` and \`Accept: application/json, text/event-stream\`. No auth. About 30 POSTs per minute per IP.
+
+\`\`\`
+curl -s ${BASE}/mcp -H 'content-type: application/json' -H 'accept: application/json, text/event-stream' \\
+  -d '{"jsonrpc":"2.0","id":1,"method":"initialize","params":{"protocolVersion":"2025-06-18","capabilities":{},"clientInfo":{"name":"my-agent","version":"1"}}}'
+curl -s ${BASE}/mcp -H 'content-type: application/json' -H 'accept: application/json, text/event-stream' \\
+  -d '{"jsonrpc":"2.0","id":2,"method":"tools/list"}'
+curl -s ${BASE}/mcp -H 'content-type: application/json' -H 'accept: application/json, text/event-stream' \\
+  -d '{"jsonrpc":"2.0","id":3,"method":"tools/call","params":{"name":"ask_kimberly","arguments":{"question":"What has she written about change management for AI?"}}}'
+\`\`\`
+
+## How to request a meeting
+Call the tool \`request_meeting\`. It queues a request for her review; nothing is booked, and she replies at your reply_to if interested. Example arguments:
+
+\`\`\`
+{"requester":"Alex Lee (Acme Health), via assistant agent","reply_to":"alex@example.com","meeting_type":"intro_call_15min","purpose":"Intro call about AI adoption in health systems","preferred_times":"Weekdays 1-4pm PT, next two weeks"}
+\`\`\`
+meeting_type is one of: ${PROFILE.meetingTypes.join("; ")} (values intro_call_15min, working_session_45min). Success returns text with a reference id. For anything else use \`leave_message\` (from, message, optional reply_to).
 
 ## About
 ${PROFILE.about}
