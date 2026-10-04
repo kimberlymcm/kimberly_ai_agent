@@ -15,3 +15,6 @@ id = "95a75fd30df14039a2dd954d344ae5b8"
 # Secrets (npx wrangler secret put <NAME>):
 #   ANTHROPIC_API_KEY  - used to answer questions
 #   ADMIN_TOKEN        - bearer token for reading the inbox at /kimberly/admin/inbox
+#   RESEND_API_KEY     - sends email alerts
+#   ALERT_TO           - the address alerts go to
+# Optional var ALERT_FROM (default "Kimberly Agent <agent@missiondistrict.ai>"); the sending domain must be verified in Resend.

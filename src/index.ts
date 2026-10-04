@@ -82,7 +82,7 @@ function landing(): Response {
 }
 
 // ---- MCP (stateless streamable HTTP, JSON responses) ----
-async function mcp(req: Request, env: Env): Promise<Response> {
+async function mcp(req: Request, env: Env, ctx: ExecutionContext): Promise<Response> {
   if (req.method !== "POST") return new Response("Method not allowed", { status: 405, headers: { allow: "POST" } });
   let msg: any;
   try { msg = await req.json(); } catch { return json({ jsonrpc: "2.0", id: null, error: { code: -32700, message: "Parse error" } }, 400); }
@@ -101,7 +101,7 @@ async function mcp(req: Request, env: Env): Promise<Response> {
     case "tools/list": return ok({ tools: TOOLS });
     case "tools/call":
       try {
-        const out = await callTool(env, msg.params?.name, msg.params?.arguments ?? {});
+        const out = await callTool(env, msg.params?.name, msg.params?.arguments ?? {}, ctx);
         return ok({ content: [{ type: "text", text: out }] });
       } catch (e) {
         return ok({ content: [{ type: "text", text: (e as Error).message }], isError: true });
@@ -111,7 +111,7 @@ async function mcp(req: Request, env: Env): Promise<Response> {
 }
 
 // ---- A2A (JSON-RPC message/send). Text parts only: first word "/meeting" or "/message" routes, else Q&A. ----
-async function a2a(req: Request, env: Env): Promise<Response> {
+async function a2a(req: Request, env: Env, ctx: ExecutionContext): Promise<Response> {
   if (req.method !== "POST") return new Response("Method not allowed", { status: 405, headers: { allow: "POST" } });
   let msg: any;
   try { msg = await req.json(); } catch { return json({ jsonrpc: "2.0", id: null, error: { code: -32700, message: "Parse error" } }, 400); }
@@ -122,9 +122,9 @@ async function a2a(req: Request, env: Env): Promise<Response> {
   if (!input) return json({ jsonrpc: "2.0", id: msg.id, error: { code: -32602, message: "No text part" } });
   let reply: string;
   try {
-    if (input.startsWith("/meeting ")) reply = await callTool(env, "request_meeting", { requester: "A2A caller", reply_to: "see message", purpose: input.slice(9) });
-    else if (input.startsWith("/message ")) reply = await callTool(env, "leave_message", { from: "A2A caller", message: input.slice(9) });
-    else reply = await callTool(env, "ask_kimberly", { question: input });
+    if (input.startsWith("/meeting ")) reply = await callTool(env, "request_meeting", { requester: "A2A caller", reply_to: "see message", purpose: input.slice(9) }, ctx);
+    else if (input.startsWith("/message ")) reply = await callTool(env, "leave_message", { from: "A2A caller", message: input.slice(9) }, ctx);
+    else reply = await callTool(env, "ask_kimberly", { question: input }, ctx);
   } catch (e) { reply = `Error: ${(e as Error).message}`; }
   return json({
     jsonrpc: "2.0",
@@ -136,12 +136,12 @@ async function a2a(req: Request, env: Env): Promise<Response> {
 async function adminInbox(req: Request, env: Env): Promise<Response> {
   if (req.headers.get("authorization") !== `Bearer ${env.ADMIN_TOKEN}` || !env.ADMIN_TOKEN) return new Response("Unauthorized", { status: 401 });
   const list = await env.INBOX.list({ limit: 100 });
-  const items = await Promise.all(list.keys.map(async (k) => JSON.parse((await env.INBOX.get(k.name)) ?? "null")));
+  const items = await Promise.all(list.keys.filter((k) => /^\d+:/.test(k.name)).map(async (k) => JSON.parse((await env.INBOX.get(k.name)) ?? "null")));
   return json(items.reverse());
 }
 
 export default {
-  async fetch(req: Request, env: Env): Promise<Response> {
+  async fetch(req: Request, env: Env, ctx: ExecutionContext): Promise<Response> {
     const url = new URL(req.url);
     const path = url.pathname.replace(/\/+$/, "");
     if (req.method === "OPTIONS")
@@ -156,8 +156,8 @@ export default {
       case "/kimberly/llms.txt": return text(llmsTxt());
       case "/kimberly/.well-known/agent.json":
       case "/kimberly/.well-known/agent-card.json": return json(agentCard());
-      case "/kimberly/mcp": return mcp(req, env);
-      case "/kimberly/a2a": return a2a(req, env);
+      case "/kimberly/mcp": return mcp(req, env, ctx);
+      case "/kimberly/a2a": return a2a(req, env, ctx);
       case "/kimberly/admin/inbox": return adminInbox(req, env);
       default: return new Response("Not found", { status: 404 });
     }

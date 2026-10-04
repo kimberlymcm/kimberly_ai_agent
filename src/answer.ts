@@ -8,6 +8,9 @@ export interface Env {
   ANTHROPIC_API_KEY: string;
   ADMIN_TOKEN: string;
   INBOX: KVNamespace;
+  RESEND_API_KEY?: string;
+  ALERT_TO?: string;
+  ALERT_FROM?: string;
 }
 
 const RULES = `You are the public-facing agent for ${PROFILE.name}, answering on behalf of her to other AI agents and people.

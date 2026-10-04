@@ -1,5 +1,6 @@
 import { answer, Env } from "./answer";
 import { PROFILE } from "./profile";
+import { noteQuestion, sendAlert } from "./notify";
 
 export const TOOLS = [
   {
@@ -52,21 +53,27 @@ async function enqueue(env: Env, kind: string, body: Record<string, unknown>) {
   return id;
 }
 
+const formatItem = (a: Record<string, unknown>) =>
+  Object.entries(a).map(([k, v]) => `${k}: ${String(v).slice(0, 2000)}`).join("\n");
+
 // Returns plain text for any tool; throws on unknown tool or bad args.
-export async function callTool(env: Env, name: string, args: Record<string, unknown>): Promise<string> {
+export async function callTool(env: Env, name: string, args: Record<string, unknown>, ctx: ExecutionContext): Promise<string> {
   switch (name) {
     case "ask_kimberly": {
       if (typeof args.question !== "string" || !args.question) throw new Error("question is required");
+      ctx.waitUntil(noteQuestion(env, args.question));
       return answer(env, args.question);
     }
     case "request_meeting": {
       for (const k of ["requester", "reply_to", "purpose"]) if (!args[k]) throw new Error(`${k} is required`);
       const id = await enqueue(env, "meeting", args);
+      ctx.waitUntil(sendAlert(env, `Meeting request from ${String(args.requester).slice(0, 80)}`, formatItem(args)));
       return `Meeting request queued (ref ${id}). Kimberly will review it and respond at the reply_to you gave. Nothing is booked yet.`;
     }
     case "leave_message": {
       if (!args.from || !args.message) throw new Error("from and message are required");
       const id = await enqueue(env, "message", args);
+      ctx.waitUntil(sendAlert(env, `Message from ${String(args.from).slice(0, 80)}`, formatItem(args)));
       return `Message delivered to Kimberly's inbox (ref ${id}).`;
     }
     default:
