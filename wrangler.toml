@@ -2,14 +2,10 @@ name = "kimberly-ai-agent"
 main = "src/index.ts"
 compatibility_date = "2025-01-01"
 
-# /kimberly* is the agent; the other routes expose discovery files at the domain root.
+# The whole domain goes to this Worker: /kimberly* is the agent, the root exposes discovery files, anything else is a 404.
+# (There is no other site on missiondistrict.ai.)
 routes = [
-  { pattern = "missiondistrict.ai/kimberly*", zone_name = "missiondistrict.ai" },
-  # Root-level discovery paths; there is no other site on this domain.
-  { pattern = "missiondistrict.ai/", zone_name = "missiondistrict.ai" },
-  { pattern = "missiondistrict.ai/llms.txt", zone_name = "missiondistrict.ai" },
-  { pattern = "missiondistrict.ai/robots.txt", zone_name = "missiondistrict.ai" },
-  { pattern = "missiondistrict.ai/.well-known/*", zone_name = "missiondistrict.ai" },
+  { pattern = "missiondistrict.ai/*", zone_name = "missiondistrict.ai" }
 ]
 
 # Create with: npx wrangler kv namespace create INBOX  (paste the id below)
