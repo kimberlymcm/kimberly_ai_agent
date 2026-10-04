@@ -10,7 +10,7 @@ routes = [
 # Create with: npx wrangler kv namespace create INBOX  (paste the id below)
 [[kv_namespaces]]
 binding = "INBOX"
-id = "REPLACE_WITH_KV_ID"
+id = "95a75fd30df14039a2dd954d344ae5b8"
 
 # Secrets (npx wrangler secret put <NAME>):
 #   ANTHROPIC_API_KEY  - used to answer questions
