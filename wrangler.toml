@@ -1,0 +1,17 @@
+name = "kimberly-ai-agent"
+main = "src/index.ts"
+compatibility_date = "2025-01-01"
+
+# Serve only the /kimberly subtree; the rest of missiondistrict.ai is untouched.
+routes = [
+  { pattern = "missiondistrict.ai/kimberly*", zone_name = "missiondistrict.ai" }
+]
+
+# Create with: npx wrangler kv namespace create INBOX  (paste the id below)
+[[kv_namespaces]]
+binding = "INBOX"
+id = "REPLACE_WITH_KV_ID"
+
+# Secrets (npx wrangler secret put <NAME>):
+#   ANTHROPIC_API_KEY  - used to answer questions
+#   ADMIN_TOKEN        - bearer token for reading the inbox at /kimberly/admin/inbox
