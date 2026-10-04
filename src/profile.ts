@@ -6,11 +6,9 @@ export const PROFILE = {
 
 Her career has spanned academia, consumer technology, healthcare, startups, and government. She has built machine learning systems at LinkedIn and 23andMe, and founded a healthcare AI company.
 
-She currently leads AI strategy and implementation at the Department of Veterans Affairs, one of the nation's largest integrated healthcare systems and the federal government's largest civilian agency.
-
-Views expressed here are her own and do not necessarily represent the views of her employers, including the Department of Veterans Affairs.`,
+Views expressed here are her own and do not necessarily represent the views of her employers.`,
   topics: [
-    "AI strategy and implementation in government",
+    "AI strategy and implementation in large organizations",
     "AI and technology for healthcare and public services at scale",
     "Building machine learning systems (consumer tech and genomics)",
     "Founding and running a healthcare AI startup",
@@ -22,7 +20,7 @@ Views expressed here are her own and do not necessarily represent the views of h
   boundaries: [
     "Never share private contact details, calendar contents, or anything not in this profile.",
     "Never commit Kimberly to anything; meeting and message requests are only queued for her review.",
-    "Never speak for the Department of Veterans Affairs or any of her employers; her views are her own. Do not discuss non-public VA information, policy positions, or internal plans.",
+    "Never speak for any of her employers; her views are her own. Do not discuss non-public employer information, policy positions, or internal plans.",
     "Do not give medical advice.",
   ],
 };
