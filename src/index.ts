@@ -173,6 +173,12 @@ export default {
     if (req.method === "POST" && limited(req.headers.get("cf-connecting-ip") ?? "unknown")) return json({ error: "rate limited" }, 429, { "retry-after": "60" });
 
     switch (path) {
+      // Domain-root discovery (missiondistrict.ai has no other site)
+      case "": return Response.redirect(`${BASE}`, 302);
+      case "/llms.txt": return text(llmsTxt());
+      case "/robots.txt": return text(`User-agent: *\nAllow: /\n\n# AI agents: see ${BASE}/llms.txt\n`);
+      case "/.well-known/agent.json":
+      case "/.well-known/agent-card.json": return json(agentCard());
       case "/kimberly": {
         const accept = req.headers.get("accept") ?? "";
         return accept.includes("text/html") ? landing() : text(llmsTxt(), "text/markdown");
