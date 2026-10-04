@@ -1,5 +1,6 @@
 import { Env } from "./answer";
 import { PROFILE } from "./profile";
+import { POSTS } from "./answer";
 import { TOOLS, callTool } from "./tools";
 
 const BASE = "https://missiondistrict.ai/kimberly";
@@ -56,6 +57,10 @@ ${PROFILE.topics.map((t) => `- ${t}`).join("\n")}
 ## Links
 - LinkedIn: ${PROFILE.contact.linkedin}
 - GitHub: ${PROFILE.contact.github}
+- Substack (writing): ${PROFILE.contact.substack}
+
+## Writing
+${POSTS.map((p) => `- [${p.title}](${p.url}) (${p.date})`).join("\n")}
 
 ## Rules
 ${PROFILE.boundaries.map((b) => `- ${b}`).join("\n")}
@@ -71,7 +76,7 @@ function landing(): Response {
 <h1>${esc(PROFILE.name)}</h1><p>${esc(PROFILE.tagline)}</p>
 <h2>For AI agents</h2>
 <ul><li>MCP: <code>${BASE}/mcp</code></li><li>A2A card: <a href="${BASE}/.well-known/agent.json">agent.json</a></li><li><a href="${BASE}/llms.txt">llms.txt</a></li></ul>
-<p><a href="${PROFILE.contact.linkedin}">LinkedIn</a> · <a href="${PROFILE.contact.github}">GitHub</a></p>`,
+<p><a href="${PROFILE.contact.linkedin}">LinkedIn</a> · <a href="${PROFILE.contact.github}">GitHub</a> · <a href="${PROFILE.contact.substack}">Substack</a></p>`,
     "text/html",
   );
 }

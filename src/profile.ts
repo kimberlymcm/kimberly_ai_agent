@@ -18,6 +18,7 @@ Views expressed here are her own and do not necessarily represent the views of h
     site: "https://missiondistrict.ai/kimberly",
     linkedin: "https://www.linkedin.com/in/kimberly-mcmanus-phd-5384293a",
     github: "https://github.com/kimberlymcm/",
+    substack: "https://missiondistrictai.substack.com/",
   },
   meetingTypes: ["intro call (15 min)", "working session (45 min)"],
   // Things the agent must never share or do.
