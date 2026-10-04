@@ -53,6 +53,10 @@ ${PROFILE.about}
 ## Topics
 ${PROFILE.topics.map((t) => `- ${t}`).join("\n")}
 
+## Links
+- LinkedIn: ${PROFILE.contact.linkedin}
+- GitHub: ${PROFILE.contact.github}
+
 ## Rules
 ${PROFILE.boundaries.map((b) => `- ${b}`).join("\n")}
 `;
@@ -66,7 +70,8 @@ function landing(): Response {
 <style>body{font:16px/1.6 system-ui;max-width:42rem;margin:3rem auto;padding:0 1rem}code{background:#8882;padding:.1em .3em;border-radius:3px}</style>
 <h1>${esc(PROFILE.name)}</h1><p>${esc(PROFILE.tagline)}</p>
 <h2>For AI agents</h2>
-<ul><li>MCP: <code>${BASE}/mcp</code></li><li>A2A card: <a href="${BASE}/.well-known/agent.json">agent.json</a></li><li><a href="${BASE}/llms.txt">llms.txt</a></li></ul>`,
+<ul><li>MCP: <code>${BASE}/mcp</code></li><li>A2A card: <a href="${BASE}/.well-known/agent.json">agent.json</a></li><li><a href="${BASE}/llms.txt">llms.txt</a></li></ul>
+<p><a href="${PROFILE.contact.linkedin}">LinkedIn</a> · <a href="${PROFILE.contact.github}">GitHub</a></p>`,
     "text/html",
   );
 }
