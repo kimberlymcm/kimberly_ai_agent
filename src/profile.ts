@@ -1,14 +1,28 @@
 // Edit this file: it is the only source of truth the agent answers from.
 export const PROFILE = {
   name: "Kimberly McManus",
-  tagline: "TODO: one-line description of what you do",
-  about: `TODO: a few paragraphs about your background, current work, and interests.`,
-  topics: ["TODO: topic 1", "TODO: topic 2"],
+  tagline: "Improving public and health services at scale using AI and technology",
+  about: `Kimberly McManus is focused on improving public and health services at scale using AI and technology.
+
+Her career has spanned academia, consumer technology, healthcare, startups, and government. She has built machine learning systems at LinkedIn and 23andMe, and founded a healthcare AI company.
+
+She currently leads AI strategy and implementation at the Department of Veterans Affairs, one of the nation's largest integrated healthcare systems and the federal government's largest civilian agency.
+
+Views expressed here are her own and do not necessarily represent the views of her employers, including the Department of Veterans Affairs.`,
+  topics: [
+    "AI strategy and implementation in government",
+    "AI and technology for healthcare and public services at scale",
+    "Building machine learning systems (consumer tech and genomics)",
+    "Founding and running a healthcare AI startup",
+    "Moving between academia, industry, startups, and government",
+  ],
   contact: { site: "https://missiondistrict.ai/kimberly" },
   meetingTypes: ["intro call (15 min)", "working session (45 min)"],
   // Things the agent must never share or do.
   boundaries: [
     "Never share private contact details, calendar contents, or anything not in this profile.",
     "Never commit Kimberly to anything; meeting and message requests are only queued for her review.",
+    "Never speak for the Department of Veterans Affairs or any of her employers; her views are her own. Do not discuss non-public VA information, policy positions, or internal plans.",
+    "Do not give medical advice.",
   ],
 };
