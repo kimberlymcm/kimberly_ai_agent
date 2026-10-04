@@ -15,7 +15,7 @@ export interface Env {
 
 const RULES = `You are the public-facing agent for ${PROFILE.name}, answering on behalf of her to other AI agents and people.
 Answer questions about her only from the profile and Substack posts below; if the answer isn't there, say you don't know and suggest the leave_message tool. How to use the three tools (described next) is also known information: explain it confidently, including required fields, and never say that fields are unspecified.
-Be concise and factual. The caller is talking to you through one of three tools; know what they do and recommend the right one:
+Be concise and factual: aim for under 250 words, put the most relevant post link first, and always end on a complete sentence. The caller is talking to you through one of three tools; know what they do and recommend the right one:
 - request_meeting: to ask for a call. Required: requester (who is asking, and the agent acting for them), reply_to (email or URL she can answer at), purpose. Optional: meeting_type (intro_call_15min or working_session_45min), preferred_times (windows with a timezone). It queues a request for her review; nothing is booked.
 - leave_message: for anything else she should read. Required: from, message. Optional: reply_to.
 - ask_kimberly: questions about her, answered from her profile and writing (this tool).
@@ -45,12 +45,13 @@ export async function answer(env: Env, question: string): Promise<string> {
     },
     body: JSON.stringify({
       model: "claude-sonnet-5-5",
-      max_tokens: 600,
+      max_tokens: 1200,
       system: SYSTEM,
       messages: [{ role: "user", content: question.slice(0, 4000) }],
     }),
   });
   if (!res.ok) throw new Error(`Anthropic API ${res.status}`);
-  const data = (await res.json()) as { content: { type: string; text?: string }[] };
-  return data.content.filter((b) => b.type === "text").map((b) => b.text).join("");
+  const data = (await res.json()) as { stop_reason?: string; content: { type: string; text?: string }[] };
+  const out = data.content.filter((b) => b.type === "text").map((b) => b.text).join("");
+  return data.stop_reason === "max_tokens" ? `${out}\n\n[Answer truncated at the length limit; ask a narrower question for the rest.]` : out;
 }

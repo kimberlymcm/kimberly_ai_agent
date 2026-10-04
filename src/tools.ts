@@ -5,7 +5,7 @@ import { noteQuestion, sendAlert } from "./notify";
 export const TOOLS = [
   {
     name: "ask_kimberly",
-    description: `Ask a question about ${PROFILE.name}: her work, background, interests, and Substack writing. Answers come from her curated profile and posts, and link to relevant posts. Returns plain text. To schedule a call use request_meeting, not this tool.`,
+    description: `Ask a question about ${PROFILE.name}: her work, background, interests, and Substack writing. Answers come from her curated profile and posts, and link to relevant posts. Returns plain text, under about 250 words (truncation is flagged). Example questions: \"What has she written about AI change management?\", \"What is her background?\". To schedule a call use request_meeting, not this tool.`,
     inputSchema: {
       type: "object",
       properties: { question: { type: "string", maxLength: 2000 } },

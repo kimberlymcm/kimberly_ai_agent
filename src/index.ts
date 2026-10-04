@@ -48,8 +48,8 @@ This is the agent endpoint for ${PROFILE.name}. AI agents can talk to it three w
 - A2A (JSON-RPC): ${BASE}/a2a. Agent card: ${BASE}/.well-known/agent.json
 - Plain text profile: ${BASE}/llms.txt (this file)
 
-## How to use (MCP, no SDK needed)
-Send JSON-RPC 2.0 over HTTP POST to ${BASE}/mcp with headers \`Content-Type: application/json\` and \`Accept: application/json, text/event-stream\`. No auth. About 30 POSTs per minute per IP.
+## Quick start for agents (MCP, no SDK needed)
+The server is stateless: no session id, and you can skip \`initialize\` and \`notifications/initialized\` and call \`tools/list\` or \`tools/call\` directly. Send JSON-RPC 2.0 over HTTP POST to ${BASE}/mcp with headers \`Content-Type: application/json\` and \`Accept: application/json, text/event-stream\`. No auth. About 30 POSTs per minute per IP.
 
 \`\`\`
 curl -s ${BASE}/mcp -H 'content-type: application/json' -H 'accept: application/json, text/event-stream' \\
@@ -61,12 +61,16 @@ curl -s ${BASE}/mcp -H 'content-type: application/json' -H 'accept: application/
 \`\`\`
 
 ## How to request a meeting
-Call the tool \`request_meeting\`. It queues a request for her review; nothing is booked, and she replies at your reply_to if interested. Example arguments:
+Call the tool \`request_meeting\`. It queues a request for her review; nothing is booked, and she replies at your reply_to if interested. Full request:
 
 \`\`\`
-{"requester":"Alex Lee (Acme Health), via assistant agent","reply_to":"alex@example.com","meeting_type":"intro_call_15min","purpose":"Intro call about AI adoption in health systems","preferred_times":"Weekdays 1-4pm PT, next two weeks"}
+curl -s ${BASE}/mcp -H 'content-type: application/json' -H 'accept: application/json, text/event-stream' -d '{"jsonrpc":"2.0","id":4,"method":"tools/call","params":{"name":"request_meeting","arguments":{"requester":"Alex Lee (Acme Health), via assistant agent","reply_to":"alex@example.com","meeting_type":"intro_call_15min","purpose":"Intro call about AI adoption in health systems","preferred_times":"Weekdays 1-4pm PT, next two weeks"}}}'
 \`\`\`
-meeting_type is one of: ${PROFILE.meetingTypes.join("; ")} (values intro_call_15min, working_session_45min). Success returns text with a reference id. For anything else use \`leave_message\` (from, message, optional reply_to).
+
+meeting_type is \`intro_call_15min\` (15 min) or \`working_session_45min\` (45 min). Success returns text with a reference id. For anything else use \`leave_message\` (from, message, optional reply_to).
+
+## Over A2A
+POST ${BASE}/a2a with method message/send and one text part. Plain text is a question. Start the text with \`/meeting \` or \`/message \` followed by your details and a way to reach you to queue a meeting request or a message.
 
 ## About
 ${PROFILE.about}
